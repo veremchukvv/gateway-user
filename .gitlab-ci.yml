@@ -1,0 +1,36 @@
+variables:
+  IMAGE: registry.gitlab.com/my_cinema/users-service
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: overlay2
+  
+stages:
+  - build_binary
+  - lint_and_test
+  - create_image
+  
+run_linter:
+  tags: [build]
+  stage: lint_and_test
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:golangci-lint-alpine
+  script:
+    - '[ -e .golangci.yml ] || cp /golangci/.golangci.yml .'
+    - golangci-lint run 
+
+build_binary:
+  tags: [build]
+  stage: build_binary
+  image: golang:alpine
+  script:
+    - go build .
+  
+create_image:
+  tags: [build]
+  stage: create_image
+  image: docker:latest
+  services:
+    - docker:18.06-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE .
+    - docker push $IMAGE  
