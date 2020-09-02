@@ -1,5 +1,5 @@
 variables:
-  IMAGE: registry.gitlab.com/my_cinema/users-service
+  IMAGE: registry.gitlab.com/my_cinema/user-gateway
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
